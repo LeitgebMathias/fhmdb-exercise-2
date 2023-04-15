@@ -16,9 +16,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HomeController implements Initializable {
     @FXML
@@ -111,5 +110,71 @@ public class HomeController implements Initializable {
 
     public void sortBtnClicked(ActionEvent actionEvent) {
         sortMovies();
+    }
+
+
+
+    //Hilfestellungen für alle Streams:
+    //https://www.geeksforgeeks.org/stream-flatmap-java-examples/
+    //abgerufen am 15.04.2023 um 21:13 Uhr.
+    //https://howtodoinjava.com/java8/stream-flatmap-example/
+    //abgerufen am 15.04.2023 um 21:14 Uhr
+    //https://www.baeldung.com/java-difference-map-and-flatmap
+    //abgerufen am 15.04.2023 um 21:14 Uhr
+
+    //https://stackify.com/streams-guide-java-8/
+    //abgerufen am 15.04.2023 um 21:39 Uhr
+
+
+    //Stream Nr 1: "Gibt jene Person zurück, die am öftesten im mainCast der übergebenen Filme vorkommt."
+    //Stream wurde getestet, funktioniert;
+    public String getMostPopularActor(List<Movie> movies) {
+
+        return movies.stream()
+                .flatMap(movie -> movie.getMainCast().stream()) //get MainCast als flatMap (alle Listen der Objekte werden zu einer großen Liste vereint)
+                .collect(Collectors.groupingBy(actor -> actor, Collectors.counting())) //Zählen der Namen der MainCasts
+                //Map (Key-Value-Pair) wird erstellt, Key = Name, Value = Häufigkeit
+                .entrySet().stream()
+                //gibt höchsten Value (Häufigkeit) aus:
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey) //gibt den Namen (in einem neuen Stream) zurück
+
+                //Zur Absicherung, falls kein Name gefunden wurde (& da ansonsten kein String, sondern Optional verwendet werden müsste):
+                .orElse("");
+    }
+
+    //Stream Nr 2: "Filtert auf den längsten Filmtitel der übergebenen Filme und gibt die Anzahl der Buchstaben des Titels zurück."
+    public int getLongestMovieTitle(List<Movie> movies) {
+
+        return movies.stream().map(Movie::getTitle)
+                .mapToInt(String::length)
+
+                .max()
+                //.toString();
+
+                .orElse(0); //notwendig, da ohne diesem orElse(0) kein "public int" möglich wäre, sondern nur OptionalInt
+                //siehe: https://stackoverflow.com/questions/47976489/difference-between-optionalint-and-int
+                //abgerufen am 15.04.2023 um 21:58 Uhr
+    }
+
+    //Stream Nr 3: "Gibt die Anzahl der Filme eines bestimmten Regisseurs zurück."
+    public long countMoviesFrom(List<Movie> movies, String director){
+
+        long numOfMovies;
+        numOfMovies = movies.stream()
+                .filter(movie -> movie.getDirectors().toString().equals(director))
+                .count();
+
+
+        return numOfMovies;
+    }
+
+    //Stream Nr 4: "Gibt jene Filme zurück, die zwischen zwei gegebenen Jahren veröffentlicht wurden."
+    public List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear){
+
+        return movies.stream()
+                .filter(movie -> movie.getReleaseYear()
+                        >= startYear && movie.getReleaseYear() <= endYear) //Bedingung: Zwischen 2 Jahreszahlen
+                .collect(Collectors.toList()); //Rückgabe als Liste
     }
 }
