@@ -13,7 +13,7 @@ public class MovieAPI {
 
     private static final OkHttpClient client = new OkHttpClient();
 
-    public static String getFilteredMovieListAsJSON(String query, String genre, Integer releaseYear, Double rating) {
+    public static String getFilteredMovieListAsJSON(String query, String genre, Integer releaseYear, Double rating) throws RuntimeException {
 
         StringBuilder URL = new StringBuilder("http://localhost:8080/movies?");
         // Falls Sonderzeichen in der Suchabfrage vorkommen, müssen diese für die URL Encoded werden.
@@ -42,7 +42,6 @@ public class MovieAPI {
         try {
             Response response = call.execute();
 
-            // TODO : Error Handling einbauen, falls keine HTTP-200 Message zurückkommt.
             return response.body().string();
 
         } catch (IOException e) {
@@ -51,7 +50,7 @@ public class MovieAPI {
     }
 
     // Diese Methode verwendet den zweiten Endpoint der API.
-    public static String getMovieFromIdAsJSON(String id){
+    public static String getMovieFromIdAsJSON(String id) throws RuntimeException {
 
         String URL = "http://localhost:8080/movies" + "/" + id;
 
@@ -64,7 +63,6 @@ public class MovieAPI {
         try {
             Response response = call.execute();
 
-            // TODO : Error Handling einbauen, falls keine HTTP-200 Message zurückkommt.
             return response.body().string();
 
         } catch (IOException e) {
