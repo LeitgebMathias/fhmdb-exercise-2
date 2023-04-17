@@ -16,9 +16,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class HomeController implements Initializable {
     @FXML
@@ -34,7 +36,16 @@ public class HomeController implements Initializable {
     public JFXComboBox genreComboBox;
 
     @FXML
+    public JFXComboBox releaseYearComboBox;
+
+    @FXML
+    public JFXComboBox ratingComboBox;
+
+    @FXML
     public JFXButton sortBtn;
+
+    @FXML
+    public JFXButton searchByIDBtn;
 
     public List<Movie> allMovies;
 
@@ -63,6 +74,15 @@ public class HomeController implements Initializable {
         genreComboBox.getItems().add("No filter");  // add "no filter" to the combobox
         genreComboBox.getItems().addAll(genres);    // add all genres to the combobox
         genreComboBox.setPromptText("Filter by Genre");
+
+        releaseYearComboBox.getItems().add("No filter");  // add "no filter" to the combobox
+        releaseYearComboBox.getItems().addAll(possibleReleaseYears()); // add all release years to the combobox
+        releaseYearComboBox.setPromptText("Filter by Release Year");
+
+        ratingComboBox.getItems().add("No filter");  // add "no filter" to the combobox
+        ratingComboBox.getItems().addAll(possibleRatings()); // add all ratings to the combobox
+        ratingComboBox.setPromptText("Filter by Rating");
+
     }
 
     // sort movies based on sortedState
@@ -78,19 +98,32 @@ public class HomeController implements Initializable {
         }
     }
 
+    public void searchByID() {
+
+    }
+
 
     // TODO : Diese Methode wird so angepasst, dass die Parameter für die Methode aus MovieAPI vorbereitet werden.
     // Der Aufruf der MovieAPI - Methode passiert dann in dieser Methode
-    public void applyAllFilters(String searchQuery, Object genre) {
+    public void applyAllFilters(String searchQuery, Object genre, Object releaseYear, Object rating) {
 
         if (searchQuery.isEmpty()) searchQuery = null;
 
-        // Wenn kein Genre ausgwählt wurde, oder "No filter" ausgewählt wurde, wird kein Wert an "getFilteredMovieListAsJSON" übergeben
+        // Wenn kein Genre oder "No filter" ausgewählt wurde, wird kein Wert an "getFilteredMovieListAsJSON" übergeben
         String genreString = null;
         if (genre != null && !genre.toString().equals("No filter")) genreString = genre.toString();
 
+
+        // Wenn kein Release Year oder "No filter" ausgewählt wurde, wird kein Wert an "getFilteredMovieListAsJSON" übergeben
+        String releaseYearString = null;
+        if (releaseYear != null && !releaseYear.toString().equals("No filter")) releaseYearString = releaseYear.toString();
+
+        // Wenn kein Rating oder "No filter" ausgewählt wurde, wird kein Wert an "getFilteredMovieListAsJSON" übergeben
+        String ratingString = null;
+        if (rating != null && !rating.toString().equals("No filter")) ratingString = rating.toString();
+
         // TODO : Aufruf von "getFilteredMovieListAsJSON" um "releaseYear" und "rating" erweitern.
-        String listOfMoviesAsJSON = MovieAPI.getFilteredMovieListAsJSON(searchQuery,genreString,null,null);
+        String listOfMoviesAsJSON = MovieAPI.getFilteredMovieListAsJSON(searchQuery,genreString,releaseYearString,ratingString);
 
         List<Movie> filteredMovies = Movie.createMovieListFromJson(listOfMoviesAsJSON);
 
@@ -99,10 +132,25 @@ public class HomeController implements Initializable {
     }
 
     public void searchBtnClicked(ActionEvent actionEvent) {
-        String searchQuery = searchField.getText().trim().toLowerCase();
-        Object genre = genreComboBox.getSelectionModel().getSelectedItem();
 
-        applyAllFilters(searchQuery, genre);
+        String searchQuery = searchField.getText().trim().toLowerCase();
+
+        Object selectedGenre = null;
+        if (genreComboBox.getSelectionModel().getSelectedItem() != null) {
+            selectedGenre = genreComboBox.getSelectionModel().getSelectedItem();
+        }
+
+        Object selectedReleaseYear = null;
+        if (releaseYearComboBox.getSelectionModel().getSelectedItem() != null) {
+            selectedReleaseYear = releaseYearComboBox.getSelectionModel().getSelectedItem();
+        }
+
+        Object selectedRating = null;
+        if (ratingComboBox.getSelectionModel().getSelectedItem() != null) {
+        selectedRating = ratingComboBox.getSelectionModel().getSelectedItem();
+        }
+
+        applyAllFilters(searchQuery, selectedGenre, selectedReleaseYear, selectedRating);
 
         if(sortedState != SortedState.NONE) {
             sortMovies();
@@ -112,4 +160,25 @@ public class HomeController implements Initializable {
     public void sortBtnClicked(ActionEvent actionEvent) {
         sortMovies();
     }
+
+    public void searchByIDBtnClicked (ActionEvent actionEvent) {
+    }
+
+    // Liste für alle möglichen release years; distinct filtert die mehrmals vorkommenden Jahre heraus
+    List<Integer> possibleReleaseYears() {
+        return observableMovies.stream()
+                .map((movie) -> movie.getReleaseYear())
+                .distinct()
+                .sorted() // sorted in ascending order
+                .collect(Collectors.toList());
+    }
+
+    List <Double> possibleRatings() {
+        List <Double> ratings = new ArrayList<>();
+        for (double i = 1.0f; i <= 10.0f; i += 1.0f) {
+            ratings.add(i);
+        }
+        return ratings;
+    }
+
 }

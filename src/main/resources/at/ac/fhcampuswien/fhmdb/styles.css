@@ -19,6 +19,10 @@
     -fx-text-fill: #ffffff;
 }
 
+.text-black {
+    -fx-text-fill: #000000;
+}
+
 .list-view .list-cell:even {
     -fx-background-color: black;
     -fx-text-fill: white;
