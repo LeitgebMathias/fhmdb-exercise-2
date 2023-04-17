@@ -108,13 +108,7 @@ public class HomeController implements Initializable {
         }
     }
 
-    public void searchByID() {
 
-    }
-
-
-    // TODO : Diese Methode wird so angepasst, dass die Parameter für die Methode aus MovieAPI vorbereitet werden.
-    // Der Aufruf der MovieAPI - Methode passiert dann in dieser Methode
     public void applyAllFilters(String searchQuery, Object genre, Object releaseYear, Object rating) {
 
         if (searchQuery.isEmpty()) searchQuery = null;
