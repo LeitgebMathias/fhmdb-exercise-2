@@ -130,7 +130,6 @@ public class HomeController implements Initializable {
         String ratingString = null;
         if (rating != null && !rating.toString().equals("No filter")) ratingString = rating.toString();
 
-
         // API Call wird ausgeführt, wobei im Falle eines Fehlers (z.B. Verbindung konnte nicht hergestellt werden)
         // eine Fehlermeldung und eine leere Liste angezeigt wird.
         String listOfMoviesAsJSON;
@@ -146,11 +145,11 @@ public class HomeController implements Initializable {
         // die Fehlermeldung wieder entfernt.
         if (!Objects.equals(infoLabel.getText(), "Welcome to FHMDb!")) infoLabel.setText("Welcome to FHMDb!");
 
-
         List<Movie> filteredMovies = Movie.createMovieListFromJson(listOfMoviesAsJSON);
 
         observableMovies.clear();
         observableMovies.addAll(filteredMovies);
+        updateReleaseYearValues();
 
         // Console Output for Testing
         System.out.println("---------------");
@@ -205,6 +204,16 @@ public class HomeController implements Initializable {
                 .distinct()
                 .sorted() // sorted in ascending order
                 .collect(Collectors.toList());
+    }
+
+    // Die Funktion updated, die Einträge in "ReleaseYear" DropDown Menü, falls es bei den Filmen, die von der API
+    // geholt worden sind, ReleaseYears gibt, welche aktuell nicht im DropDown ersichtlich sind.
+    private void updateReleaseYearValues() {
+        if(possibleReleaseYears().size() > (releaseYearComboBox.getItems().size() - 1)){
+            releaseYearComboBox.getItems().clear();
+            releaseYearComboBox.getItems().add("No filter");  // add "no filter" to the combobox
+            releaseYearComboBox.getItems().addAll(possibleReleaseYears());
+        }
     }
 
     List <Double> possibleRatings() {
