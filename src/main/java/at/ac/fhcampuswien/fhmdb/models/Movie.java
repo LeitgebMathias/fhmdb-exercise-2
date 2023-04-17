@@ -108,10 +108,18 @@ public class Movie {
         return List.of(gson.fromJson(movieDataAsJSON, Movie[].class));
     }
 
-    public static List<Movie> initializeMovies(){
+    public static List<Movie> initializeMovies() throws RuntimeException {
         // Die Filme werden hier initial über die API geholt.
-        String movieDataAsJSON = MovieAPI.getFilteredMovieListAsJSON(null,null,null,null);
-        // Der JSON-String der API wird hier in eine Liste von Filmen umgewandelt.
-        return Movie.createMovieListFromJson(movieDataAsJSON);
+        // Falls dabei ein Fehler auftritt (z.B. Server kann nicht erreicht werden), kommt es zu einer Exception.
+        try {
+            String movieDataAsJSON = MovieAPI.getFilteredMovieListAsJSON(null,null,null,null);
+
+            // Der JSON-String der API wird hier in eine Liste von Filmen umgewandelt.
+            return Movie.createMovieListFromJson(movieDataAsJSON);
+
+        } catch (Exception e){
+            // Diese Exception wird in der aufrufenden Funktion behandelt.
+            throw new RuntimeException(e);
+        }
     }
 }
