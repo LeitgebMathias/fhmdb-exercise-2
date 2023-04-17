@@ -52,8 +52,24 @@ public class MovieAPI {
 
     // Diese Methode verwendet den zweiten Endpoint der API.
     public static String getMovieFromIdAsJSON(String id){
-        // TODO : Muss ich noch fertig schreiben
-        return null;
+
+        String URL = "http://localhost:8080/movies" + "/" + id;
+
+        Request request = new Request.Builder()
+                .url(URL)
+                .addHeader("User-Agent","*/*")
+                .build();
+
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+
+            // TODO : Error Handling einbauen, falls keine HTTP-200 Message zurückkommt.
+            return response.body().string();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
