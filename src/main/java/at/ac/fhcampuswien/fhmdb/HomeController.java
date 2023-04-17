@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
@@ -43,7 +44,10 @@ public class HomeController implements Initializable {
     public JFXButton sortBtn;
 
     @FXML
+
     public JFXButton searchByIDBtn;
+
+    public Label infoLabel;
 
     public List<Movie> allMovies;
 
@@ -58,7 +62,14 @@ public class HomeController implements Initializable {
     }
 
     public void initializeState() {
-        allMovies = Movie.initializeMovies();
+        try{
+            allMovies = Movie.initializeMovies();
+        }catch(Exception e){
+            showErrorInfo();
+            // Falls beim Laden der Filme ein Fehler aufgetreten ist, werden keine
+            // Suchergebnisse angezeigt.
+            allMovies = new ArrayList<>() {};
+        }
         observableMovies.clear();
         observableMovies.addAll(allMovies); // add all movies to the observable list
         sortedState = SortedState.NONE;
@@ -111,7 +122,6 @@ public class HomeController implements Initializable {
         String genreString = null;
         if (genre != null && !genre.toString().equals("No filter")) genreString = genre.toString();
 
-
         // Wenn kein Release Year oder "No filter" ausgewählt wurde, wird kein Wert an "getFilteredMovieListAsJSON" übergeben
         String releaseYearString = null;
         if (releaseYear != null && !releaseYear.toString().equals("No filter")) releaseYearString = releaseYear.toString();
@@ -120,8 +130,22 @@ public class HomeController implements Initializable {
         String ratingString = null;
         if (rating != null && !rating.toString().equals("No filter")) ratingString = rating.toString();
 
-        // TODO : Aufruf von "getFilteredMovieListAsJSON" um "releaseYear" und "rating" erweitern.
-        String listOfMoviesAsJSON = MovieAPI.getFilteredMovieListAsJSON(searchQuery,genreString,releaseYearString,ratingString);
+
+        // API Call wird ausgeführt, wobei im Falle eines Fehlers (z.B. Verbindung konnte nicht hergestellt werden)
+        // eine Fehlermeldung und eine leere Liste angezeigt wird.
+        String listOfMoviesAsJSON;
+        try {
+            listOfMoviesAsJSON = MovieAPI.getFilteredMovieListAsJSON(searchQuery,genreString,releaseYearString,ratingString);
+        }catch(Exception e){
+            showErrorInfo();
+            observableMovies.clear();
+            return;
+        }
+
+        // Falls es beim letzten Versuch Verbindungsprobleme zur API gab, und jetzt hat es wieder funktioniert,
+        // die Fehlermeldung wieder entfernt.
+        if (!Objects.equals(infoLabel.getText(), "Welcome to FHMDb!")) infoLabel.setText("Welcome to FHMDb!");
+
 
         List<Movie> filteredMovies = Movie.createMovieListFromJson(listOfMoviesAsJSON);
 
@@ -171,7 +195,6 @@ public class HomeController implements Initializable {
         sortMovies();
     }
 
-
     public void searchByIDBtnClicked (ActionEvent actionEvent) {
     }
 
@@ -190,6 +213,11 @@ public class HomeController implements Initializable {
             ratings.add(i);
         }
         return ratings;
+    }
+    
+    private void showErrorInfo(){
+        // Falls es beim API Request zu einem Fehler kam, wird eine leere Liste angezeigt.
+        infoLabel.setText("Connection to Remote API could not be established. - Please try again!");
     }
 
     //Hilfestellungen für alle Streams:
