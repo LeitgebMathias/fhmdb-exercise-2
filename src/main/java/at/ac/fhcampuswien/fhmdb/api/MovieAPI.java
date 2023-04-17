@@ -64,9 +64,15 @@ public class MovieAPI {
         try {
             Response response = call.execute();
 
+            // Wenn die API keinen Film mit der übergebenen ID findet, wird ein HTTP-ERROR 400 zurückgeliefert.
+            // In diesem Fall soll in der aufrufenden Funktion eine Infomeldung angezeigt werden.
+            if(response.code() >= 400 &&  response.code() <= 499) {
+                return "ERROR_400";
+            }
+            // Falls kein Fehler aufgetreten ist, wird der JSON String des Films zurückgegeben.
             return response.body().string();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

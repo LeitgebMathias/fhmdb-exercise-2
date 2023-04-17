@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb.api;
 
+import at.ac.fhcampuswien.fhmdb.models.Movie;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,12 +9,13 @@ class MovieAPITest {
 
     @Test
     void getMovieFromIdAsJSON() {
-        String theGodfatherMovieId = "cf98675d-010e-493b-8bcd-690ffacd4bae";
+        String theGodfatherMovieJSON = MovieAPI.getFilteredMovieListAsJSON("The Godfather","DRAMA","1972","9");
+        String theGodfatherMovieId = Movie.createMovieListFromJson(theGodfatherMovieJSON).get(0).getId();
 
         String apiResponsesIdEndpoint = MovieAPI.getMovieFromIdAsJSON(theGodfatherMovieId);
 
         String expectedResult =
-                "{\"id\":\"cf98675d-010e-493b-8bcd-690ffacd4bae\",\"title\":\"The Godfather\"," +
+                "{\"id\":\"" + theGodfatherMovieId  + "\",\"title\":\"The Godfather\"," +
                         "\"genres\":[\"DRAMA\"],\"releaseYear\":1972,\"description\":" +
                         "\"The aging patriarch of an organized crime dynasty transfers control of his " +
                         "clandestine empire to his reluctant son.\"," +

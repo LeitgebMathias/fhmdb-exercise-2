@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
 import java.net.URL;
 
 import java.util.*;
@@ -160,7 +161,9 @@ public class HomeController implements Initializable {
         System.out.println("---------------");
         System.out.println("Filme zwischen 2000 und 2020");
         for ( Movie movie : getMoviesBetweenYears(filteredMovies,2000,2020)) {
-            System.out.println(movie.getTitle());
+            System.out.println("Filmtitel : " + movie.getTitle());
+            System.out.println("Zugehörige Film-ID : " + movie.getId());
+            System.out.println("--");
         }
     }
 
@@ -195,6 +198,34 @@ public class HomeController implements Initializable {
     }
 
     public void searchByIDBtnClicked (ActionEvent actionEvent) {
+        String movieData;
+
+        String searchQuery = searchField.getText().trim().toLowerCase();
+        try{
+            movieData = MovieAPI.getMovieFromIdAsJSON(searchQuery);
+            if (movieData.equals("ERROR_400")){
+                observableMovies.clear();
+                infoLabel.setText("We could not find a movie with the entered ID.");
+            }
+        } catch (Exception e){
+            // Falls kein Eintrag mit der übergebenen ID gefunden wurde, wird eine leere Liste und
+            // eine Fehlermeldung angezeigt.
+            observableMovies.clear();
+            showErrorInfo();
+            return;
+        }
+
+        // moviedata wird um eckige Klammern ergänzt.
+        // Der Grund ist, dass die Funktion "createMovieListFromJson" nur ein JSON Array verarbeiten kann.
+        // Der API "ID-Endpoint" liefert allerdings nur ein JSON-Objekt und kein JSON Array.
+        // Mit den eckigen Klammern wird movieData zu einem JSON-Array mit nur einem Objekt, welches die Methode
+        // "createMovieListFromJson"  verarbeiten kann.
+        movieData = "[" + movieData + "]";
+
+        List<Movie> filteredMovie = Movie.createMovieListFromJson(movieData);
+
+        observableMovies.clear();
+        observableMovies.addAll(filteredMovie);
     }
 
     // Liste für alle möglichen release years; distinct filtert die mehrmals vorkommenden Jahre heraus
