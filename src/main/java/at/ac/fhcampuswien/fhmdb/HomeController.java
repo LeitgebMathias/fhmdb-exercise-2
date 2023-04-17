@@ -136,13 +136,18 @@ public class HomeController implements Initializable {
             return;
         }
 
+        observableMovies.clear();
+
+        List<Movie> filteredMovies = Movie.createMovieListFromJson(listOfMoviesAsJSON);
+        if(filteredMovies.size() == 0){
+            infoLabel.setText("We could not find a movie with the entered Filter-Criteria.");
+            return;
+        }
+
         // Falls es beim letzten Versuch Verbindungsprobleme zur API gab, und jetzt hat es wieder funktioniert,
         // die Fehlermeldung wieder entfernt.
         if (!Objects.equals(infoLabel.getText(), "Welcome to FHMDb!")) infoLabel.setText("Welcome to FHMDb!");
 
-        List<Movie> filteredMovies = Movie.createMovieListFromJson(listOfMoviesAsJSON);
-
-        observableMovies.clear();
         observableMovies.addAll(filteredMovies);
         updateReleaseYearValues();
 
@@ -200,6 +205,7 @@ public class HomeController implements Initializable {
             if (movieData.equals("ERROR_400")){
                 observableMovies.clear();
                 infoLabel.setText("We could not find a movie with the entered ID.");
+                return;
             }
         } catch (Exception e){
             // Falls kein Eintrag mit der übergebenen ID gefunden wurde, wird eine leere Liste und
