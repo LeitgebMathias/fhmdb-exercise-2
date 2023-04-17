@@ -13,7 +13,8 @@ public class MovieAPI {
 
     private static final OkHttpClient client = new OkHttpClient();
 
-    public static String getFilteredMovieListAsJSON(String query, String genre, Integer releaseYear, Double rating) throws RuntimeException {
+    public static String getFilteredMovieListAsJSON(String query, String genre, String releaseYear, String rating) {
+
 
         StringBuilder URL = new StringBuilder("http://localhost:8080/movies?");
         // Falls Sonderzeichen in der Suchabfrage vorkommen, müssen diese für die URL Encoded werden.

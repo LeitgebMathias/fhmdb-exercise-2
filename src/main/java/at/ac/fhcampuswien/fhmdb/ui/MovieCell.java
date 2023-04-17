@@ -14,7 +14,15 @@ public class MovieCell extends ListCell<Movie> {
     private final Label title = new Label();
     private final Label detail = new Label();
     private final Label genre = new Label();
-    private final VBox layout = new VBox(title, detail, genre);
+
+    private final Label movieData = new Label();
+
+    private final Label writersAndDirectors = new Label();
+
+    private final Label mainCast = new Label();
+
+
+    private final VBox layout = new VBox(title, detail, genre, movieData, writersAndDirectors, mainCast);
 
     @Override
     protected void updateItem(Movie movie, boolean empty) {
@@ -38,12 +46,24 @@ public class MovieCell extends ListCell<Movie> {
                     .collect(Collectors.joining(", "));
             genre.setText(genres);
 
+            movieData.setText("Year: " + movie.getReleaseYear() + " • Runtime: " + movie.getLengthInMinutes() + " min • Rating: " + movie.getRating());
+
+            writersAndDirectors.setText("Writers: " + movie.getWriters().toString().replaceAll("[\\[\\](){}]","") + " • Directors: " + movie.getDirectors().toString().replaceAll("[\\[\\](){}]",""));
+
+            mainCast.setText("Main Cast: " + movie.getMainCast().toString().replaceAll("[\\[\\](){}]",""));
+
+            // for formatting used the help of: https://stackoverflow.com/questions/25852961/how-to-remove-brackets-character-in-string-java
 
             // color scheme
             title.getStyleClass().add("text-yellow");
             detail.getStyleClass().add("text-white");
             genre.getStyleClass().add("text-white");
             genre.setStyle("-fx-font-style: italic");
+            movieData.getStyleClass().add("text-black");
+            writersAndDirectors.getStyleClass().add("text-black");
+            mainCast.getStyleClass().add("text-black");
+
+
             layout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
 
             // layout
