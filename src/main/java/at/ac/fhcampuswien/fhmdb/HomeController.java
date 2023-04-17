@@ -95,6 +95,18 @@ public class HomeController implements Initializable {
 
         observableMovies.clear();
         observableMovies.addAll(filteredMovies);
+
+        // Console Output for Testing
+        System.out.println("---------------");
+        System.out.println("Most popular Actor : " + getMostPopularActor(filteredMovies));
+        System.out.println("Longest Movie Title : " + getLongestMovieTitle(filteredMovies));
+        System.out.println("Number of Movie from Director " + filteredMovies.get(0).getDirectors().get(0) + " : " +
+                countMoviesFrom(filteredMovies,filteredMovies.get(0).getDirectors().get(0)));
+        System.out.println("---------------");
+        System.out.println("Filme zwischen 2000 und 2020");
+        for ( Movie movie : getMoviesBetweenYears(filteredMovies,2000,2020)) {
+            System.out.println(movie.getTitle());
+        }
     }
 
     public void searchBtnClicked(ActionEvent actionEvent) {
@@ -162,9 +174,8 @@ public class HomeController implements Initializable {
 
         long numOfMovies;
         numOfMovies = movies.stream()
-                .filter(movie -> movie.getDirectors().toString().equals(director))
+                .filter(movie -> movie.getDirectors().contains(director))
                 .count();
-
 
         return numOfMovies;
     }
