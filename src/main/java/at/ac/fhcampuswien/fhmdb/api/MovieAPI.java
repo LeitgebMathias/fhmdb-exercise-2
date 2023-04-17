@@ -19,7 +19,7 @@ public class MovieAPI {
         StringBuilder URL = new StringBuilder("http://localhost:8080/movies?");
         // Falls Sonderzeichen in der Suchabfrage vorkommen, müssen diese für die URL Encoded werden.
         if (query != null) {
-            // Leerzeichen werden ignoriert.
+            // Es kann damit auch nach Sonderzeichen gefiltert werden
             query = URLEncoder.encode(query, StandardCharsets.UTF_8);
             // Der Befehl oben wandelt ein Leerzeichen in ein "+" um. Das wird mit dem folgenden Befehl korrigiert.
             query = query.replace("+","%20");
